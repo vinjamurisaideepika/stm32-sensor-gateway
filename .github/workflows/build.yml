@@ -1,0 +1,29 @@
+# Compiles the STM32 firmware on every push, so the badge in the README
+# proves the code builds. Runs on GitHub's servers: nothing to install.
+name: firmware-build
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  stm32:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install ARM GCC
+        run: sudo apt-get update && sudo apt-get install -y gcc-arm-none-eabi libnewlib-arm-none-eabi
+
+      - name: Fetch STM32 HAL + CMSIS
+        working-directory: tools/ci
+        run: |
+          mkdir -p vendor && cd vendor
+          git clone --depth 1 https://github.com/STMicroelectronics/stm32f4xx_hal_driver.git
+          git clone --depth 1 https://github.com/STMicroelectronics/cmsis_device_f4.git
+          git clone --depth 1 --filter=blob:none --sparse https://github.com/ARM-software/CMSIS_5.git
+          cd CMSIS_5 && git sparse-checkout set CMSIS/Core/Include
+
+      - name: Build
+        working-directory: tools/ci
+        run: make

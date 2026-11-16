@@ -1,0 +1,12 @@
+# Build output
+tools/ci/build/
+tools/ci/vendor/
+**/Debug/
+**/Release/
+*.o
+*.elf
+*.map
+# IDE
+.settings/
+*.launch
+.DS_Store
